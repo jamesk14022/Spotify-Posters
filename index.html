@@ -1,0 +1,53 @@
+<html ng-app="thingsToWatch">
+<head>
+	<title>Spotify Posters</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="js/core.js"></script>
+	<link rel="stylesheet" href="/css/home-styles.css">
+</head>
+<body ng-controller="mainController">
+			<div id="cover-background">
+			<div class="container-fluid">
+			<div class="row">
+
+				<!-- insert background images heres
+				<div class="col-md-2">
+					<img src="" class="img-responsive"/>
+				</div> -->
+
+			</div>	
+			</div>
+			<div id="focus-options">
+				<h2>Easily create posters from your Spotify tracks, albums or playlists.</h2>
+
+				<ul class="list-group">
+				  <li class="list-group-item">
+				  <a href="#">
+				  <i class="fa fa-music fa-label" aria-hidden="true"></i>
+				  Create a Track Poster
+				  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+				  </a>
+				  </li>
+				  <li class="list-group-item">
+				  <i class="fa fa-headphones fa-label" aria-hidden="true"></i>
+				  Create an Album Poster
+				  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+				  </li>
+				  <li class="list-group-item">
+				  <i class="fa fa-bars fa-label" aria-hidden="true"></i>
+				  Create a Playlist Poster
+				  <i class="fa fa-arrow-right" aria-hidden="true"></i>
+				  </li>
+				</ul>
+			</div>
+			</div>
+		<?php else: ?>
+			<p><a href="<?= $url; ?>">Log in to Spotify</a></p>
+		<?php endif; ?>
+</body>
+</html>
