@@ -14,25 +14,96 @@ var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi({
 	clientId : '94b6c64210d14fc78e328d649819b63c',
 	clientSecret : '9f4fc95e4f604d53bbc967b6c518e7fd',
-	redirectUri : 'http://localhost:3000/nodealbumcollation'
+	redirectUri : 'http://localhost:3000/auth_success'
 });
 
 app.get('/', function(req, res){
 	res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('api/auth', function(req, res){
-	console.log('api/auth endpoint request');
-	console.log(req.body[0]);
+app.get('/auth_success', function(req, res){
+	if(req.query.code){
+		res.sendFile(path.join(__dirname, 'auth_success.html'));
+	}else{
+		res.sendFile(path.join(__dirname, 'index.html'));
+	}
+});
 
+app.post('/api/auth', function(req, res){
+	console.log('api/auth endpoint request');
 	spotifyApi.authorizationCodeGrant(req.body[0].code)
-		.then(function(data){
-			// Set the access token on the API object to use it in later calls
-		    spotifyApi.setAccessToken(data.body['access_token']);
-		    spotifyApi.setRefreshToken(data.body['refresh_token']);
-		    console.log('Tokens set');
-		}, function(err){
-			console.log('Error when getting token.', err); 
+	.then(function(data){
+		// Set the access token on the API object to use it in later calls
+	    spotifyApi.setAccessToken(data.body['access_token']);
+	    spotifyApi.setRefreshToken(data.body['refresh_token']);
+	    console.log('Tokens set');
+	    res.sendStatus(200);
+	}, function(err){
+		console.log('Error when getting token.', err); 
+		res.sendStatus(400);
+	});
+});
+
+app.post('/api/songtrackart/urls', function(req, res){
+	spotifyApi.getMySavedTracks({limit : 50})
+	.then(function(data){
+		var urls = []
+		for(var i = 0; i < data.body.items.length; i++){
+			urls.push(data.body.items[i].track.album.images[0].url);
+		}
+		uniqueUrls = urls.filter(function(item, pos, self) {
+			return self.indexOf(item) == pos;
+		});
+		res.json(uniqueUrls);
+	}, function(err){
+		console.log('Error getting saved tracks', err);
+	});
+});
+
+app.post('/api/albumtrackart/urls', function(req, res){
+	spotifyApi.getMySavedTracks({limit : 50})
+	.then(function(data){
+		var urls = []
+		for(var i = 0; i < data.body.items.length; i++){
+			urls.push(data.body.items[i].track.album.images[0].url);
+		}
+		uniqueUrls = urls.filter(function(item, pos, self) {
+			return self.indexOf(item) == pos;
+		});
+		res.json(uniqueUrls);
+	}, function(err){
+		console.log('Error getting saved tracks', err);
+	});
+});
+
+app.post('/api/playlisttrackart/urls', function(req, res){
+	var userId;
+	spotifyApi.getMe()
+	.then(function(data){
+		spotifyApi.getPlaylist(data.body.id, req.body.id)
+	    .then(function(dataInt) {
+	        var urls = []
+			for(var i = 0; i < dataInt.body.tracks.items.length; i++){
+				urls.push(dataInt.body.tracks.items[i].track.album.images[0].url);
+			}
+			uniqueUrls = urls.filter(function(item, pos, self) {
+    			return self.indexOf(item) == pos;
+			});
+			res.json(uniqueUrls);
+	    }, function(err) {
+	        console.log('Something went wrong!', err);
+		});
+	}, function(err){
+		console.log('Error getting user information.', err);
+	});
+});
+
+app.post('/api/playlists', function(req, res){
+	spotifyApi.getUserPlaylists()
+	.then(function(data){
+		res.json(data.body);
+	}, function(err){
+		console.log('Error getting playlists.', err);
 	});
 });
 

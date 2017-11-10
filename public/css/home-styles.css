@@ -1,12 +1,18 @@
-div.col-md-2{
-	padding: 0px;
-}
-
-div#cover-background img{
-    filter: opacity(.55) brightness(.6);
-}
-
 div#focus-options{
+	z-index: 2;
+	position: absolute;
+	left: 0; 
+  	right: 0; 
+  	margin-left: auto; 
+  	margin-right: auto; 
+  	top: 200px;
+	background-color: #ECECEA;
+	color: black;
+	width: 600px;
+	padding: 40px 150px;
+}
+
+div#playlist-options{
 	z-index: 2;
 	position: absolute;
 	left: 0; 
@@ -30,4 +36,9 @@ div#focus-options i.fa-arrow-right{
 
 div#focus-options i.fa-label{
 	margin-right: 10px;
+}
+
+img.cover{
+	height: 287px;
+	width: 100%;
 }
