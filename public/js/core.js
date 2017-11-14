@@ -32,21 +32,43 @@ app.controller('mainController', ['$scope', '$http', '$location', '$compile', fu
 	}
 
 	$scope.insertCoverArt = function(urls){
-		console.log(urls);
+		//ensures images fill all rows in the poster
+		var rowLength = 6;
+		var remainder = urls.length % rowLength;
+		if(remainder !== 0){
+			urls = urls.slice(0, urls.length - remainder);
+		}
+
+		var canvas = document.getElementById('poster');
+		var ctx = canvas.getContext('2d');
+
 		for(var i = 0; i < urls.length; i++){
+			//render poster preview with boostrap
 			var div = document.createElement('div');
 			div.setAttribute('class', 'col-md-2');
-
 			var img = document.createElement('img');
 			img.setAttribute('src', urls[i]);
 			img.setAttribute('class', 'cover');
 			div.append(img);
 
 			$('.image-container').append(div);
-			$('#focus-options').hide();
-			$('#playlist-options').hide();
-			$('.list-playlists').hide();
+
+			img.onLoad = function(j = i){
+				//render actual poster image(w/ merged images) onto a canvas
+				var dx = 317;
+				var dy = 287;
+				var dWidth = (j % rowLength) * dx;
+				var dHeight = Math.floor(j / rowLength) * dy;
+				ctx.drawImage(img, dx, dy, dWidth, dHeight);
+			} 
 		}
+
+
+
+		$('div.nav').show();
+		$('#focus-options').hide();
+		$('#playlist-options').hide();
+		$('.list-playlists').hide();
 	}
 
 	$scope.showUserPlaylists = function(){
@@ -63,3 +85,9 @@ app.controller('mainController', ['$scope', '$http', '$location', '$compile', fu
 		});
 	}
 }]);
+
+$(document).ready(function(){
+		var link = document.getElementById('download');
+		link.setAttribute('download', 'MintyPaper.png');
+		link.setAttribute('href', document.getElementById('poster').toDataURL("image/png").replace("image/png", "image/octet-stream"));
+});

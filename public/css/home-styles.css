@@ -1,3 +1,7 @@
+div.nav{
+	display: none;
+}
+
 div#focus-options{
 	z-index: 2;
 	position: absolute;
@@ -41,4 +45,12 @@ div#focus-options i.fa-label{
 img.cover{
 	height: 287px;
 	width: 100%;
+}
+
+div.col-md-2{
+	padding: 0px;
+}
+
+canvas#poster{
+	display: none;
 }
