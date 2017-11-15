@@ -39,31 +39,23 @@ app.controller('mainController', ['$scope', '$http', '$location', '$compile', fu
 			urls = urls.slice(0, urls.length - remainder);
 		}
 
-		var canvas = document.getElementById('poster');
-		var ctx = canvas.getContext('2d');
-
 		for(var i = 0; i < urls.length; i++){
-			//render poster preview with boostrap
-			var div = document.createElement('div');
-			div.setAttribute('class', 'col-md-2');
 			var img = document.createElement('img');
-			img.setAttribute('src', urls[i]);
-			img.setAttribute('class', 'cover');
-			div.append(img);
-
-			$('.image-container').append(div);
-
-			img.onLoad = function(j = i){
+			img.crossOrigin = 'anonymous';
+			img.data = { 
+				j : i
+			}
+			img.onload = function(){
 				//render actual poster image(w/ merged images) onto a canvas
+				console.log(this);
 				var dx = 317;
 				var dy = 287;
-				var dWidth = (j % rowLength) * dx;
-				var dHeight = Math.floor(j / rowLength) * dy;
-				ctx.drawImage(img, dx, dy, dWidth, dHeight);
+				var dWidth = (this.data.j % rowLength) * dx;
+				var dHeight = Math.floor(this.data.j / rowLength) * dy;
+				document.getElementById('poster').getContext('2d').drawImage(this, dWidth, dHeight, dx, dy);
 			} 
+			img.setAttribute('src', urls[i]);
 		}
-
-
 
 		$('div.nav').show();
 		$('#focus-options').hide();
@@ -84,10 +76,27 @@ app.controller('mainController', ['$scope', '$http', '$location', '$compile', fu
 			}
 		});
 	}
+
 }]);
 
+//hacky method to make sure canvas download is prepper only after all uimages are acctuallyinserted
 $(document).ready(function(){
+	function dataURLtoBlob(dataurl) {
+	    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+	        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+	    while(n--){
+	        u8arr[n] = bstr.charCodeAt(n);
+	    }
+	    return new Blob([u8arr], {type:mime});
+	}
+	setTimeout(function(){
 		var link = document.getElementById('download');
-		link.setAttribute('download', 'MintyPaper.png');
-		link.setAttribute('href', document.getElementById('poster').toDataURL("image/png").replace("image/png", "image/octet-stream"));
+		var imgData = document.getElementById('poster').toDataURL({format: 'png', multiplier: 4});
+		var strDataURI = imgData.substr(22, imgData.length);
+		var blob = dataURLtoBlob(imgData);
+      	var objurl = URL.createObjectURL(blob);
+
+      	link.href = objurl;
+    	link.download = 'poster';
+	}, 3000);
 });
