@@ -47,7 +47,6 @@ app.controller('mainController', ['$scope', '$http', '$location', '$compile', fu
 			}
 			img.onload = function(){
 				//render actual poster image(w/ merged images) onto a canvas
-				console.log(this);
 				var dx = 317;
 				var dy = 287;
 				var dWidth = (this.data.j % rowLength) * dx;
@@ -98,5 +97,6 @@ $(document).ready(function(){
 
       	link.href = objurl;
     	link.download = 'poster';
-	}, 3000);
+    	link.click();
+	}, 4000);
 });

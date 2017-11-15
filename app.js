@@ -9,6 +9,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({type : 'application/vnd.api+json'}));
 
 const URL = require('url');
+const COVERSMAX = 72;
 
 var SpotifyWebApi = require('spotify-web-api-node');
 var spotifyApi = new SpotifyWebApi({
@@ -45,19 +46,35 @@ app.post('/api/auth', function(req, res){
 });
 
 app.post('/api/songtrackart/urls', function(req, res){
+	var urls = [];
 	spotifyApi.getMySavedTracks({limit : 50})
 	.then(function(data){
-		var urls = []
 		for(var i = 0; i < data.body.items.length; i++){
 			urls.push(data.body.items[i].track.album.images[0].url);
 		}
+		if(urls.length < COVERSMAX){
+			spotifyApi.getMySavedTracks({limit : 50, offset : urls.length})
+			.then(function(data){
+				for(var i = 0; i < data.body.items.length; i++){
+					urls.push(data.body.items[i].track.album.images[0].url);
+				}
+				sendUrls(urls);
+			}, function(err){
+				console.log('Error getting saved tracks', err);
+			});
+		}else{
+			sendUrls(urls);
+		}
+	}, function(err){
+		console.log('Error getting saved tracks', err);
+	});
+
+	function sendUrls(urls){
 		uniqueUrls = urls.filter(function(item, pos, self) {
 			return self.indexOf(item) == pos;
 		});
 		res.json(uniqueUrls);
-	}, function(err){
-		console.log('Error getting saved tracks', err);
-	});
+	}
 });
 
 app.post('/api/albumtrackart/urls', function(req, res){
@@ -77,25 +94,42 @@ app.post('/api/albumtrackart/urls', function(req, res){
 });
 
 app.post('/api/playlisttrackart/urls', function(req, res){
+	var urls = [];
 	var userId;
 	spotifyApi.getMe()
 	.then(function(data){
 		spotifyApi.getPlaylist(data.body.id, req.body.id)
 	    .then(function(dataInt) {
-	        var urls = []
-			for(var i = 0; i < dataInt.body.tracks.items.length; i++){
+	        for(var i = 0; i < dataInt.body.tracks.items.length; i++){
 				urls.push(dataInt.body.tracks.items[i].track.album.images[0].url);
 			}
-			uniqueUrls = urls.filter(function(item, pos, self) {
-    			return self.indexOf(item) == pos;
+			if(urls.length < COVERSMAX){
+				spotifyApi.getPlaylist(data.body.id, req.body.id, {limit : 50, offset : urls.length})
+				.then(function(data){
+					for(var i = 0; i < data.body.tracks.items.length; i++){
+						urls.push(data.body.tracks.items[i].track.album.images[0].url);
+					}
+					sendUrls(urls);
+				}, function(err){
+					console.log('Error getting saved tracks', err);
+				});
+			}else{
+				sendUrls(urls);
+			}
+		    }, function(err) {
+		        console.log('Something went wrong!', err);
 			});
-			res.json(uniqueUrls);
-	    }, function(err) {
-	        console.log('Something went wrong!', err);
-		});
 	}, function(err){
 		console.log('Error getting user information.', err);
 	});
+
+
+	function sendUrls(urls){
+		uniqueUrls = urls.filter(function(item, pos, self) {
+			return self.indexOf(item) == pos;
+		});
+		res.json(uniqueUrls);
+	}
 });
 
 app.post('/api/playlists', function(req, res){
