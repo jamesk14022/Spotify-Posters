@@ -18,6 +18,7 @@ div#focus-options{
 	color: black;
 	width: 600px;
 	padding: 40px 150px;
+	text-align: center;
 }
 
 div#playlist-options{
@@ -35,7 +36,7 @@ div#playlist-options{
 }
 
 div#focus-options h2{
-	margin-bottom: 45px;
+	margin-bottom: 60px;
 }
 
 div#focus-options i.fa-arrow-right{
@@ -57,4 +58,13 @@ div.col-md-2{
 
 div.image-container{
 	display: none;
+}
+
+a#login{
+	border: 2px solid #939393;
+	padding: 7px;
+	border-radius: 12px;
+	margin: 0px auto;
+	display: inline-block;
+	background-color: white;
 }
