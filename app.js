@@ -96,34 +96,28 @@ app.post('/api/albumtrackart/urls', function(req, res){
 app.post('/api/playlisttrackart/urls', function(req, res){
 	var urls = [];
 	var userId;
-	spotifyApi.getMe()
-	.then(function(data){
-		spotifyApi.getPlaylist(data.body.id, req.body.id)
-	    .then(function(dataInt) {
-	        for(var i = 0; i < dataInt.body.tracks.items.length; i++){
-				urls.push(dataInt.body.tracks.items[i].track.album.images[0].url);
-			}
-			if(urls.length < COVERSMAX){
-				spotifyApi.getPlaylist(data.body.id, req.body.id, {limit : 50, offset : urls.length})
-				.then(function(data){
-					for(var i = 0; i < data.body.tracks.items.length; i++){
-						urls.push(data.body.tracks.items[i].track.album.images[0].url);
-					}
-					sendUrls(urls);
-				}, function(err){
-					console.log('Error getting saved tracks', err);
-				});
-			}else{
+	spotifyApi.getPlaylist(req.body.owner, req.body.id)
+    .then(function(dataInt) {
+        for(var i = 0; i < dataInt.body.tracks.items.length; i++){
+			urls.push(dataInt.body.tracks.items[i].track.album.images[0].url);
+		}
+		if(urls.length < COVERSMAX){
+			spotifyApi.getPlaylist(req.body.owner, req.body.id, {limit : 50, offset : urls.length})
+			.then(function(data){
+				for(var i = 0; i < data.body.tracks.items.length; i++){
+					urls.push(data.body.tracks.items[i].track.album.images[0].url);
+				}
 				sendUrls(urls);
-			}
-		    }, function(err) {
-		        console.log('Something went wrong!', err);
+			}, function(err){
+				console.log('Error getting saved tracks', err);
 			});
-	}, function(err){
-		console.log('Error getting user information.', err);
+		}else{
+			sendUrls(urls);
+		}
+    }, function(err) {
+        console.log('Something went wrong!', err);
 	});
-
-
+	
 	function sendUrls(urls){
 		uniqueUrls = urls.filter(function(item, pos, self) {
 			return self.indexOf(item) == pos;
